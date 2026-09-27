@@ -1,16 +1,449 @@
 {
   "folders": [
-    { "id": "folder-general", "name": "General", "order": 0 }
+    {
+      "id": "c5b18f88-c65b-47ac-bb15-babc91976fa0",
+      "name": "Global",
+      "order": 0
+    },
+    {
+      "id": "d3806fe5-c5c5-46fd-a3b8-08f599369ffa",
+      "name": "Delivery Associate Application",
+      "order": 1
+    },
+    {
+      "id": "607bda29-d4e3-49e6-972f-489a3bcce05c",
+      "name": "Picker Application",
+      "order": 2
+    },
+    {
+      "id": "d2075f27-d831-4aa0-95b7-d0dbc7e77021",
+      "name": "Customer Complaint / Unfortunate Experience",
+      "order": 3
+    },
+    {
+      "id": "ad852d4b-6c51-46f9-828b-5155dff2a9ec",
+      "name": "Delay / High Volume",
+      "order": 4
+    },
+    {
+      "id": "5764d212-daed-4bc6-b5fb-1a8406561344",
+      "name": "Delivery Area / Coverage",
+      "order": 5
+    },
+    {
+      "id": "45abbef0-3ea9-43b6-be7d-7698fc38df85",
+      "name": "Pricing",
+      "order": 6
+    },
+    {
+      "id": "af4b8890-e675-4769-8c12-39553c980abf",
+      "name": "Discounts / Promo Codes",
+      "order": 7
+    },
+    {
+      "id": "cfeab4d6-68c1-4747-a5ff-2438b1c65417",
+      "name": "Restaurant Availability",
+      "order": 8
+    },
+    {
+      "id": "0448ae3f-e5b3-4751-87e1-41325c1f5fec",
+      "name": "Competitions / Giveaways",
+      "order": 9
+    },
+    {
+      "id": "131296e5-0a44-4f66-a26a-c02b9ae1da5b",
+      "name": "Careers / Recruitment",
+      "order": 10
+    },
+    {
+      "id": "0a0aaade-b6e6-45b8-ad1c-95020392794c",
+      "name": "Partnerships / Business Inquiries",
+      "order": 11
+    },
+    {
+      "id": "982ac88e-6f94-4367-b402-f634e0f4a1de",
+      "name": "Company Statements",
+      "order": 12
+    }
   ],
   "snippets": [
     {
-      "id": "snippet-example",
-      "title": "Example snippet",
-      "content": "Replace this with your real reply text — or delete it once you've added your own.",
-      "folderId": "folder-general",
+      "id": "bf73293f-3ef0-4aad-8ef7-d9033ff7b406",
+      "title": "Positive Feedback (-Epos)",
+      "content": "Thanks for sharing, we’re so glad you enjoyed it!",
+      "folderId": "c5b18f88-c65b-47ac-bb15-babc91976fa0",
       "order": 0,
-      "createdAt": 0,
-      "updatedAt": 0
+      "createdAt": 1787111971604,
+      "updatedAt": 1787112124426
+    },
+    {
+      "id": "501b5b7d-2942-4fec-9b3a-d02c87087313",
+      "title": "Positive Feedback - Thanks (-pos)",
+      "content": "شكرًا لمشاركتنا رأيك، مبسوطين جدًا إن التجربة عجبت حضرتك!",
+      "folderId": "c5b18f88-c65b-47ac-bb15-babc91976fa0",
+      "order": 1,
+      "createdAt": 1787112033391,
+      "updatedAt": 1787112139246
+    },
+    {
+      "id": "9227cd0b-7779-46c1-b7e3-bb3711c656a5",
+      "title": "Negative Feedback (-Eneg)",
+      "content": "We’re really sorry to hear that. Please DM us your order details so we can look into it.",
+      "folderId": "c5b18f88-c65b-47ac-bb15-babc91976fa0",
+      "order": 2,
+      "createdAt": 1787112101733,
+      "updatedAt": 1787112101733
+    },
+    {
+      "id": "36cb5bb6-e369-47f0-9199-7226181419a2",
+      "title": "Negative Feedback (-neg)",
+      "content": "بنعتذر لحضرتك جدًا إن تجربتك كانت بالشكل ده. ياريت تبعتلنا تفاصيل الطلب على الخاص عشان نقدر نراجع المشكلة ونتابعها مع حضرتك.",
+      "folderId": "c5b18f88-c65b-47ac-bb15-babc91976fa0",
+      "order": 3,
+      "createdAt": 1787112185497,
+      "updatedAt": 1787112185497
+    },
+    {
+      "id": "61f13f65-03b3-48f5-a290-b7d61f7465de",
+      "title": "Esclation Case (-Eesn)",
+      "content": "Hi [Name], we’re really sorry to hear that. We’ve escalated this to our team and will get back to you shortly.”",
+      "folderId": "c5b18f88-c65b-47ac-bb15-babc91976fa0",
+      "order": 4,
+      "createdAt": 1787117622659,
+      "updatedAt": 1787117758419
+    },
+    {
+      "id": "ccffc625-e28b-4322-a8aa-0502ab1cb793",
+      "title": "Esclation Case (-esn)",
+      "content": "أهلًا [الاسم]،إحنا بجد بنعتذر لحضرتك فعلًا إن التجربة كانت بالشكل ده. إحنا صعّدنا الموضوع للفريق المختص، وهنرجع لحضرتك في أقرب وقت.",
+      "folderId": "c5b18f88-c65b-47ac-bb15-babc91976fa0",
+      "order": 5,
+      "createdAt": 1787117749399,
+      "updatedAt": 1787117749399
+    },
+    {
+      "id": "ba05d277-a9a6-4068-86a9-e82c07d43f4f",
+      "title": "Delivery Associate Vacancy (Edelass)",
+      "content": "Thank you for your comment. You can apply for the vacancy of Delivery Associate, and our hiring team will be reaching out as soon as possible to share all the details. Please use the following link to apply:\nhttps://breadfast.com/en/deliver",
+      "folderId": "d3806fe5-c5c5-46fd-a3b8-08f599369ffa",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "1e7f5c99-ff94-41f4-aa7f-6c3bc696bafe",
+      "title": "Delivery Associate Vacancy (delass)",
+      "content": "بنشكرك على تعليقك. يمكنك التقديم على وظيفة مندوب توصيل وهيتم التواصل مع حضرتك من خلال فريق التوظيف في أقرب وقت ممكن لتوضيح كافة التفاصيل. التقديم من خلال الرابط التالي:\nhttps://breadfast.com/ar/deliver",
+      "folderId": "d3806fe5-c5c5-46fd-a3b8-08f599369ffa",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "3063c62a-06ed-4fc2-9364-533d50a5b7e6",
+      "title": "Picker Vacancy (Epicvac)",
+      "content": "Thank you for your comment. You can apply for the Picker vacancy, and our hiring team will be reaching out as soon as possible to share all the details. Please use the following link to apply:\nhttps://brdfst.com/hiring/picker",
+      "folderId": "607bda29-d4e3-49e6-972f-489a3bcce05c",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "3487da89-e3a1-408b-8882-4a0310a5744b",
+      "title": "Picker Vacancy (picvac)",
+      "content": "بنشكرك على تعليقك. تقدر تقدم على وظيفة محضر طلبات وهيتم التواصل مع حضرتك من خلال فريق التوظيف في أقرب وقت ممكن لتوضيح كافة التفاصيل. التقديم من خلال الرابط التالي:\nhttps://brdfst.com/hiring/picker",
+      "folderId": "607bda29-d4e3-49e6-972f-489a3bcce05c",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "f2c357d7-6ef7-495d-a647-7223fc27f79c",
+      "title": "Apology - Need More Details (DM) (Eaponee)",
+      "content": "We sincerely apologize for the unfortunate experience and any unintentional inconvenience. Could you please provide us with more details through direct messages so we can report this to our team?",
+      "folderId": "d2075f27-d831-4aa0-95b7-d0dbc7e77021",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "8dc30f49-4a01-4c48-8595-c78cabfc724d",
+      "title": "Apology - Need More Details (DM) (aponee)",
+      "content": "بنعتذر جداً عن أي إزعاج غير مقصود. نكون ممتنين جداً لمشاركتنا تفاصيل أكتر عن المشكلة اللي واجهتك ورقم الهاتف المسجل في الحساب من خلال رسائل الصفحة لتقرير الأمر لفريقنا.",
+      "folderId": "d2075f27-d831-4aa0-95b7-d0dbc7e77021",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "3f5af79f-69d8-4dc3-aa6f-c9372d5198cc",
+      "title": "Apology - Unsatisfactory Experience (Email) (Eapouns)",
+      "content": "We sincerely apologize for this unfortunate experience. We assure you this is not at all the experience we want you to have with Breadfast. Could you please provide us with more details through an email to cx@breadfast.com?",
+      "folderId": "d2075f27-d831-4aa0-95b7-d0dbc7e77021",
+      "order": 2,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "5c2ef768-6a0c-4f27-b129-f6064b4ec6ab",
+      "title": "Apology - Unsatisfactory Experience (Email) (apouns)",
+      "content": "بنعتذر جداً عن التجربة الغير مُرضية وعن أي إزعاج غير مقصود. بنأكدلك إن مش دي التجربة اللي نتمناها لحضرتك مع بريدفاست. نكون ممتنين جداً لمشاركتنا تفاصيل أكتر عن المشكلة اللي واجهتك ولم يتم حلها من خلال الإيميل cx@breadfast.com لتقرير الأمر وتصحيحه في أسرع وقت ممكن.",
+      "folderId": "d2075f27-d831-4aa0-95b7-d0dbc7e77021",
+      "order": 3,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "c3033af6-3820-4666-ac4e-ac6285afad54",
+      "title": "Apology - Order Not As Expected (Eapoord)",
+      "content": "We're very sorry to hear that the order you received wasn't as expected. We assure you this is not at all the experience we want you to have with Breadfast. We'd be truly grateful if you share with us more details through direct messages to deliver your feedback to our team.",
+      "folderId": "d2075f27-d831-4aa0-95b7-d0dbc7e77021",
+      "order": 4,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "70768b11-64e4-438a-b1d8-b00dd3abbd24",
+      "title": "Apology - Order Not As Expected (apoord)",
+      "content": "بنعتذر جداً عن التجربة الغير مُرضية وعن وصول الطلب بشكل مختلف عن توقعاتك. بنأكدلك إن مش دي التجربة اللي نتمناها لحضرتك مع بريدفاست. نكون ممتنين جداً لمشاركتنا تفاصيل أكتر ورقم الهاتف المسجل في الحساب من خلال رسائل الصفحة لتقرير الأمر وتصحيحه في أسرع وقت ممكن.",
+      "folderId": "d2075f27-d831-4aa0-95b7-d0dbc7e77021",
+      "order": 5,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "9258f624-7c41-4fd1-8854-8cf3f98f70ef",
+      "title": "Apology - Delay Due To High Volume (Eapodel)",
+      "content": "We sincerely apologize for this unfortunate experience and this delay due to high volume of orders and messages at the moment. We assure you that our team is working on getting back to all of our customers as soon as possible.",
+      "folderId": "ad852d4b-6c51-46f9-828b-5155dff2a9ec",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "4ba535df-deb6-4a21-839e-4b4aaee2a02b",
+      "title": "Apology - Delay Due To High Volume (apodel)",
+      "content": "بنعتذر جداً عن أي إزعاج أو تأخير غير مقصود لوجود ضغط في الطلبات والرسائل حالياً، وبنأكدلك أن فريقنا يعمل بأقصى جهد للإجابة على استفسارات جميع عملائنا في أسرع وقت ممكن.",
+      "folderId": "ad852d4b-6c51-46f9-828b-5155dff2a9ec",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "87a4a235-4b5b-4681-8955-8967b61b9583",
+      "title": "How To Check Delivery Coverage (App) (Ehowto)",
+      "content": "Thank you for your comment. You can download the app and set your location on the map. The Restaurants section, details, and prices will appear if your location is within our delivery coverage. We'll be waiting for your feedback.\nTo download the App for Android:\nhttps://play.google.com/store/apps/details?id=com.breadfast\nfor iOS:\nhttps://apps.apple.com/us/app/breadfast/id1288436997",
+      "folderId": "5764d212-daed-4bc6-b5fb-1a8406561344",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "afd03343-f6d1-4270-b869-e3961577edc1",
+      "title": "How To Check Delivery Coverage (App) (howto)",
+      "content": "بنشكرك على تعليقك. يمكنك تحميل التطبيق وتحديد العنوان على الخريطة من خلاله، وهيتم ظهور قسم المطاعم والتفاصيل والأسعار عند وجود المكان داخل نطاق التوصيل. هنكون منتظرين رأيك في خدمتنا.\nلو هاتف حضرتك أندرويد: https://play.google.com/store/apps/details?id=com.breadfast\nلو هاتف حضرتك أيفون: https://apps.apple.com/us/app/breadfast/id1288436997",
+      "folderId": "5764d212-daed-4bc6-b5fb-1a8406561344",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "860eff57-e92d-4faa-ac45-db039195c270",
+      "title": "Delivery Expansion - Vote For Area (Edelexp)",
+      "content": "Thank you for your comment. We'd like to assure you that we're always working to expand our delivery coverage and reach more areas as soon as possible. Please vote for your area through the app so we can consider adding it to our plans.",
+      "folderId": "5764d212-daed-4bc6-b5fb-1a8406561344",
+      "order": 2,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "594900f6-dcb5-4b27-bac6-9a758e2cb9f2",
+      "title": "Delivery Expansion - Vote For Area (delexp)",
+      "content": "بنشكرك على تعليقك وبنأكدلك أننا بنسعى بشكل دائم للتوسع والحرص على التوصيل لمناطق أكتر في أسرع وقت ممكن. نرجو التصويت للمنطقة المحددة من خلال التطبيق لإضافتها لخطط التوسع.",
+      "folderId": "5764d212-daed-4bc6-b5fb-1a8406561344",
+      "order": 3,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "07d70a25-69e9-42ca-acdf-9b7333a4cdb5",
+      "title": "Delivery Not Available In Area (Edelnot)",
+      "content": "Thank you for your comment. Delivery is currently not available in the selected area. We'd like to assure you that we're always working to expand our delivery coverage and reach more areas as soon as possible. Please vote for your area through the app so we can consider adding it to our expansion plans.",
+      "folderId": "5764d212-daed-4bc6-b5fb-1a8406561344",
+      "order": 4,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "81ca1ca6-c702-4194-8c05-6a4f3362701d",
+      "title": "Delivery Not Available In Area (delnot)",
+      "content": "بنشكرك على تعليقك. التوصيل غير متاح حالياً للمكان المحدد. وبنأكدلك أننا بنسعى بشكل دائم للتوسع والحرص على التوصيل لمناطق أكتر في أسرع وقت ممكن. نرجو التصويت للمنطقة المحددة من خلال التطبيق لإضافتها لخطط التوسع.",
+      "folderId": "5764d212-daed-4bc6-b5fb-1a8406561344",
+      "order": 5,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "bdd39ea2-9bc5-4af8-843c-efaae67c2efb",
+      "title": "Price Change Complaint (Epricha)",
+      "content": "We completely understand your frustration regarding the constant changes of prices. Unfortunately, that's completely out of our hands due to price changes by our partner restaurants. We'd like to assure you that we're always working to provide the best service to our customers while also providing fast delivery.",
+      "folderId": "45abbef0-3ea9-43b6-be7d-7698fc38df85",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "b63ddc18-0d18-4ec4-b137-28a910bf965f",
+      "title": "Price Change Complaint (pricha)",
+      "content": "نتفهم تمامًا استياء حضرتك من التغييرات المستمرة في الأسعار. للأسف، ده خارج عن سيطرتنا، نظرًا للتغييرات في الأسعار من جانب المطاعم الشريكة لنا. ونحب نأكد لحضرتك إننا بنعمل باستمرار على تقديم أفضل خدمة لعملائنا، مع توفير أسرع خدمة توصيل.",
+      "folderId": "45abbef0-3ea9-43b6-be7d-7698fc38df85",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "c890d6a9-38d2-408e-9245-acc68fb9b70c",
+      "title": "Discounts & Promo Codes (Edispro)",
+      "content": "Thanks for your comment. You can find our discounts and promo codes on the app's homepage, through SMS, and on our social media pages whenever available.",
+      "folderId": "af4b8890-e675-4769-8c12-39553c980abf",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "bddb3195-53b6-40dd-9d02-6577e1f44ceb",
+      "title": "Discounts & Promo Codes (dispro)",
+      "content": "بنشكرك على تعليقك. بيتم الإعلان عن الخصومات والكوبونات من خلال الصفحة الرئيسية على التطبيق، وعبر الرسائل النصية وصفحاتنا على صفحات التواصل الاجتماعي، عند توافرها.",
+      "folderId": "af4b8890-e675-4769-8c12-39553c980abf",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "136cf05b-a04e-42c3-ba38-628a0a2e41b8",
+      "title": "Restaurant Not Available (Eresnot)",
+      "content": "Thank you for your comment. This restaurant is not currently available through our restaurant service. We'd like to assure you that we're always working to expand our service and make it available to more restaurants and in more areas.",
+      "folderId": "cfeab4d6-68c1-4747-a5ff-2438b1c65417",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "4e199107-8476-4cf3-8499-68afc4cfd413",
+      "title": "Restaurant Not Available (resnot)",
+      "content": "بنشكرك على تعليقك. المطعم ده مش متاح حاليًا ضمن خدمة المطاعم، وبنحب نأكدلك إننا بنسعى باستمرار للتوسع وتوفير خدمة المطاعم لأكبر عدد ممكن من المطاعم وفي أكبر عدد من المناطق.",
+      "folderId": "cfeab4d6-68c1-4747-a5ff-2438b1c65417",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "b695274c-4995-4d52-bc47-d2db07df9409",
+      "title": "Competition Winner (Ecomwin)",
+      "content": "Thank you so much for taking part in the Breadfast competition. We're happy to let you know that you're one of our winners. 🎉",
+      "folderId": "0448ae3f-e5b3-4751-87e1-41325c1f5fec",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "320bcba3-90a3-40d9-b6b5-1ef7cc94a68e",
+      "title": "Competition Winner (comwin)",
+      "content": "بنشكرك جداً على مشاركتك في مسابقة بريدفاست، وحابين نشارك مع حضرتك أنك من الفائزين معانا 🎉",
+      "folderId": "0448ae3f-e5b3-4751-87e1-41325c1f5fec",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "c808c52d-9a5e-470f-9246-6756da3393b6",
+      "title": "Careers - Open Vacancies (EN link) (Ecarope)",
+      "content": "Hello,\nThank you so much for reaching out.\n\nYou can find the current open vacancies through this link:\nhttps://www.breadfast.com/en/careers\n\nWe wish you the best of luck.",
+      "folderId": "131296e5-0a44-4f66-a26a-c02b9ae1da5b",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "9ffc1b30-a07d-43a1-9b09-c468a3a09955",
+      "title": "Careers - Open Vacancies (EN link) (carope)",
+      "content": "أهلًا،\nشكرًا لتواصلك معنا.\n\nيمكنك الاطلاع على الوظائف الحالية والتقديم عليها من خلال الرابط التالي:\nhttps://www.breadfast.com/en/careers\n\nنتمنى لك كل التوفيق.",
+      "folderId": "131296e5-0a44-4f66-a26a-c02b9ae1da5b",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "e6e32197-6f91-4377-8d33-aa64e9d5a398",
+      "title": "Careers - Open Vacancies (AR link) (Ecarvac)",
+      "content": "Thank you for reaching out to us. You can find all the currently available job openings through the following link:\nhttps://www.breadfast.com/ar/careers",
+      "folderId": "131296e5-0a44-4f66-a26a-c02b9ae1da5b",
+      "order": 2,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "434d70e1-35a9-4ac5-9759-cd1115f399ef",
+      "title": "Careers - Open Vacancies (AR link) (carvac)",
+      "content": "بنشكرك على تواصلك معانا. الرابط التالي متاح عليه كل الوظائف المتاحة حالياً:\nhttps://www.breadfast.com/ar/careers",
+      "folderId": "131296e5-0a44-4f66-a26a-c02b9ae1da5b",
+      "order": 3,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "d032cc16-42f7-4769-beba-35e4d08874f5",
+      "title": "Application Under Review (Eappund)",
+      "content": "Thank you for your comment. Our recruitment team will contact you as soon as possible after reviewing your application.",
+      "folderId": "131296e5-0a44-4f66-a26a-c02b9ae1da5b",
+      "order": 4,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "47243021-3626-4800-b97b-bbc3bb847a91",
+      "title": "Application Under Review (appund)",
+      "content": "بنشكرك على تعليقك. بيتم التواصل مع حضرتك من خلال فريق التوظيف عند فرز استمارات التقديم في أقرب وقت ممكن.",
+      "folderId": "131296e5-0a44-4f66-a26a-c02b9ae1da5b",
+      "order": 5,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "e27c818c-2c63-465d-b983-8e8209ce3e08",
+      "title": "Partnership / Business Inquiries (Eparbus)",
+      "content": "Hello,\nThank you so much for reaching out.\n\nPlease contact our team directly through an email to partners@breadfast.com or info@breadfast.com.",
+      "folderId": "0a0aaade-b6e6-45b8-ad1c-95020392794c",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "4d2a436a-d8e7-467c-96fc-a58dc0396500",
+      "title": "Partnership / Business Inquiries (parbus)",
+      "content": "أهلًا،\nشكرًا لتواصلك معنا.\n\nيمكنك التواصل مع الفريق المختص مباشرةً من خلال البريد الإلكتروني على partners@breadfast.com أو info@breadfast.com.",
+      "folderId": "0a0aaade-b6e6-45b8-ad1c-95020392794c",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "67df4d7c-09cd-474d-86af-0fe8af803a78",
+      "title": "Company Statement - Egyptian Ownership (Ecomsta)",
+      "content": "Breadfast is a 100% Egyptian company, founded and operated from Egypt with a fully Egyptian management team. Our position is clear and firm in supporting the Palestinian cause. We have no commercial or operational ties with the occupying state. If you have any further inquiries, you can contact us at media@breadfast.com.",
+      "folderId": "982ac88e-6f94-4367-b402-f634e0f4a1de",
+      "order": 0,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
+    },
+    {
+      "id": "f05a7cb0-6604-4ab7-9d2c-3f207d47b8ba",
+      "title": "Company Statement - Egyptian Ownership (comsta)",
+      "content": "بريدفاست شركة مصرية ١٠٠٪، تأسست وبتتدار من مصر بإدارة مصرية بالكامل. موقفنا واضح وثابت في دعم القضية الفلسطينية. مالناش أي علاقة تجارية أو تشغيلية مع دولة الاحتلال. لو عندك أي استفسار تاني، تقدر تتواصل معانا على media@breadfast.com.",
+      "folderId": "982ac88e-6f94-4367-b402-f634e0f4a1de",
+      "order": 1,
+      "createdAt": 1789303968022,
+      "updatedAt": 1789385382582
     }
   ],
   "tasks": []
