@@ -1,0 +1,17 @@
+{
+  "folders": [
+    { "id": "folder-general", "name": "General", "order": 0 }
+  ],
+  "snippets": [
+    {
+      "id": "snippet-example",
+      "title": "Example snippet",
+      "content": "Replace this with your real reply text — or delete it once you've added your own.",
+      "folderId": "folder-general",
+      "order": 0,
+      "createdAt": 0,
+      "updatedAt": 0
+    }
+  ],
+  "tasks": []
+}
