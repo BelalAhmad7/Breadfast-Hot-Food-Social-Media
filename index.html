@@ -75,22 +75,22 @@
 
   .topbar {
     position: sticky; top: 0; z-index: 20;
-    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px;
+    display: flex; align-items: center; gap: 18px;
     padding: 12px 22px;
     background: var(--surface);
     border-bottom: 1px solid var(--line);
     flex-wrap: wrap;
   }
-  .brand { display: flex; align-items: center; gap: 10px; flex: none; justify-self: start; }
+  .brand { display: flex; align-items: center; gap: 10px; flex: none; }
   .brand img { width: 34px; height: 34px; border-radius: 9px; flex: none; }
   .brand-name { font-family: var(--font-display); font-weight: 800; font-size: 17px; letter-spacing: -0.01em; line-height: 1.15; }
   .brand-sub { font-size: 11px; color: var(--ink-faint); }
 
-  .tabs { display: flex; background: var(--brand-wash); border-radius: 999px; padding: 3px; flex: none; justify-self: center; }
+  .tabs { display: flex; background: var(--brand-wash); border-radius: 999px; padding: 3px; flex: none; }
   .tab-btn { border: 0; background: transparent; cursor: pointer; padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 13.5px; color: var(--brand-deep); }
   .tab-btn.is-active { background: var(--brand); color: #fff; }
 
-  .topbar-right { justify-self: end; display: flex; align-items: center; gap: 10px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
   .icon-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink-faint); width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex: none; }
   .icon-btn:hover { color: var(--ink); border-color: var(--ink-faint); }
 
@@ -220,8 +220,6 @@
     .folder-rail-head { display: none; }
     .folder-chip { flex: none; white-space: nowrap; }
     main { padding: 16px 14px 50px; }
-    .topbar { grid-template-columns: 1fr auto; }
-    .topbar .tabs { grid-column: 1 / -1; justify-self: center; order: 3; }
   }
 </style>
 </head>
@@ -307,51 +305,26 @@
   </div>
   <div class="drawer-section">
     <h3>Data source</h3>
-    <p class="hint">Folders, snippets and tasks are stored in a shared Firebase database and sync live — everyone who has this page open sees changes within a second or two, no exporting or replacing files needed. The button below just downloads a local backup copy any time you want one.</p>
-    <button class="btn btn-ghost" id="exportAllBtn">Download a backup (.json)</button>
+    <p class="hint">All data loads from <code>data.json</code> in this app's own folder — everyone who opens this page sees the same file. Admin actions update this browser's copy only; to actually publish a change for everyone, export the file below and replace <code>data.json</code> in the app's folder with it.</p>
+    <button class="btn btn-ghost" id="exportAllBtn">Export current data (.json)</button>
   </div>
 </aside>
 
 <div id="toast" class="toast" hidden></div>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
+<script>
 (function () {
   'use strict';
 
   // ==================================================================
-  // Data source: a shared Firebase project (Firestore). Folders, snippets
-  // and tasks live in three top-level collections there; every open tab
-  // subscribes to live updates (onSnapshot below) instead of loading a
-  // static file, so a change made on one device shows up everywhere else
-  // within a second or two, with no manual export/import step.
+  // Data source: everyone loads the same data.json sitting next to this
+  // HTML file. There is no backend, so this app can only READ that file —
+  // nothing here can write back to it. Admin actions below change this
+  // browser's in-memory copy only; to actually publish a change for
+  // everyone, export the data (Settings drawer) and replace data.json in
+  // the app's folder with the exported file.
   // ==================================================================
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwb5l_m_6XV0p4wOWDpXr8sbGFktLoBCE",
-    authDomain: "hootfood-smp-db.firebaseapp.com",
-    projectId: "hootfood-smp-db",
-    storageBucket: "hootfood-smp-db.firebasestorage.app",
-    messagingSenderId: "491152786202",
-    appId: "1:491152786202:web:ebe03810bec5651b69e2a3"
-  };
-  const fbApp = initializeApp(firebaseConfig);
-  const db = getFirestore(fbApp);
-
-  // Fire-and-forget writes to Firestore. The local `state` array is always
-  // updated first so the UI feels instant; these just push that same
-  // change to the shared database. Failures (e.g. no network, or the
-  // Firestore rules aren't published yet) surface as a toast rather than
-  // silently vanishing.
-  function syncSet(collectionName, obj) {
-    setDoc(doc(db, collectionName, obj.id), obj)
-      .catch((e) => toast('Could not save to the shared database: ' + e.message, true));
-  }
-  function syncDelete(collectionName, id) {
-    deleteDoc(doc(db, collectionName, id))
-      .catch((e) => toast('Could not delete from the shared database: ' + e.message, true));
-  }
+  const DATA_URL = 'data.json';
 
   const LS_SETTINGS = 'bf_settings'; // theme is a personal display preference, kept locally — not shared data
 
@@ -477,36 +450,29 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
 
   function isBareNumber(s) { return /^[+-]?(\d+(\.\d+)?|\.\d+)$/.test(s.trim()); }
 
-  // NOTE: to anyone using the app this just looks like a password field.
-  // Nothing in the UI hints that the accepted "password" is actually any
-  // arithmetic expression that evaluates to a fixed target — every failure
-  // path below returns the same generic message on purpose, so don't add
-  // any error text that gives that away.
   function checkAdminExpression(raw) {
     const trimmed = (raw || '').trim();
-    const generic = { ok: false, error: 'Incorrect password.' };
-    if (!trimmed) return generic;
-    if (isBareNumber(trimmed)) return generic;
+    if (!trimmed) return { ok: false, error: 'Enter an expression.' };
+    if (isBareNumber(trimmed)) return { ok: false, error: "Enter a calculation, not just the answer — e.g. \"12 - 5\", not \"7\"." };
     let result;
     try { result = evaluateArithmetic(trimmed); }
-    catch (e) { return generic; }
-    if (Math.abs(result - ADMIN_TARGET) > 1e-9) return generic;
+    catch (e) { return { ok: false, error: 'Not a valid expression — only numbers and + − × ÷ ( ) are allowed.' }; }
+    if (Math.abs(result - ADMIN_TARGET) > 1e-9) return { ok: false, error: 'Incorrect.' };
     return { ok: true };
   }
 
-  // Password-only admin gate — used for actions with no name attached
-  // (folder management, drag-reorder, export). Looks like an ordinary
-  // password prompt.
+  // Math-only admin gate — used for actions with no name attached (folder
+  // management, drag-reorder, export).
   function requireAdmin(heading) {
     return new Promise((resolve) => {
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
       overlay.innerHTML = `
         <div class="modal-card">
-          <h3>Password required</h3>
+          <h3>Admin check</h3>
           <p class="hint" style="margin:-4px 0 10px;">${escapeHtml(heading || 'This changes shared data.')}</p>
-          <label for="admExpr">Password</label>
-          <input id="admExpr" class="field-input" type="password" placeholder="Enter password" autocomplete="off" />
+          <label for="admExpr">Enter a calculation whose answer is the admin value — not the answer itself</label>
+          <input id="admExpr" class="field-input" placeholder="e.g. 12 - 5" autocomplete="off" />
           <p class="hint" id="admErr" style="color:var(--danger); display:none;"></p>
           <div class="modal-actions">
             <button class="btn btn-ghost btn-sm" data-act="cancel">Cancel</button>
@@ -530,10 +496,8 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
     });
   }
 
-  // Name buttons + password gate combined in one dialog — used for task
-  // create/edit/delete, where we also want to record who did it. Pick a
-  // name with one tap, then just type the password (no typing your name).
-  const ADMIN_NAMES = ['Belal', 'Youssef'];
+  // Name + admin gate combined in one dialog — used for task create/edit/
+  // delete, where we also want to record who did it.
   function promptNameAndAdmin(heading) {
     return new Promise((resolve) => {
       const overlay = document.createElement('div');
@@ -541,12 +505,10 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
       overlay.innerHTML = `
         <div class="modal-card">
           <h3>${escapeHtml(heading)}</h3>
-          <label>Your name</label>
-          <div class="name-choice-row" style="display:flex;gap:8px;margin-bottom:10px;">
-            ${ADMIN_NAMES.map((n) => `<button type="button" class="btn btn-ghost btn-sm name-choice" data-name="${escapeHtml(n)}" style="flex:1;">${escapeHtml(n)}</button>`).join('')}
-          </div>
-          <label for="pnaExpr">Password</label>
-          <input id="pnaExpr" class="field-input" type="password" placeholder="Enter password" autocomplete="off" />
+          <label for="pnaName">Your name</label>
+          <input id="pnaName" class="field-input" style="margin-bottom:10px;" placeholder="e.g. Belal" />
+          <label for="pnaExpr">Admin check — enter a calculation, not the answer</label>
+          <input id="pnaExpr" class="field-input" placeholder="e.g. 12 - 5" autocomplete="off" />
           <p class="hint" id="pnaErr" style="color:var(--danger); display:none;"></p>
           <div class="modal-actions">
             <button class="btn btn-ghost btn-sm" data-act="cancel">Cancel</button>
@@ -554,32 +516,22 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
           </div>
         </div>`;
       document.body.appendChild(overlay);
-      let selectedName = null;
-      const nameButtons = Array.from(overlay.querySelectorAll('.name-choice'));
+      const nameInput = overlay.querySelector('#pnaName');
       const exprInput = overlay.querySelector('#pnaExpr');
       const errEl = overlay.querySelector('#pnaErr');
-      nameButtons.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          selectedName = btn.dataset.name;
-          nameButtons.forEach((b) => {
-            b.classList.toggle('btn-primary', b === btn);
-            b.classList.toggle('btn-ghost', b !== btn);
-          });
-          errEl.style.display = 'none';
-        });
-      });
       const close = (val) => { overlay.remove(); resolve(val); };
       overlay.addEventListener('click', (e) => { if (e.target === overlay) close(null); });
       overlay.querySelector('[data-act="cancel"]').addEventListener('click', () => close(null));
       const submit = () => {
-        if (!selectedName) { errEl.textContent = 'Choose your name.'; errEl.style.display = 'block'; return; }
+        const name = nameInput.value.trim();
+        if (!name) { errEl.textContent = 'Enter a name.'; errEl.style.display = 'block'; nameInput.focus(); return; }
         const check = checkAdminExpression(exprInput.value);
         if (!check.ok) { errEl.textContent = check.error; errEl.style.display = 'block'; exprInput.select(); return; }
-        close(selectedName);
+        close(name);
       };
       overlay.querySelector('[data-act="ok"]').addEventListener('click', submit);
-      exprInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
-      setTimeout(() => exprInput.focus(), 0);
+      [nameInput, exprInput].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); }));
+      setTimeout(() => nameInput.focus(), 0);
     });
   }
 
@@ -676,7 +628,6 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
     if (!ok) return;
     const folder = { id: uid(), name: 'New folder', order: state.folders.length };
     state.folders.push(folder);
-    syncSet('folders', folder);
     state.renamingFolderId = folder.id;
     renderSnippets();
   });
@@ -714,7 +665,7 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
           const val = input.value.trim();
           if (val && val !== f.name) {
             const ok = await requireAdmin(`Rename folder to "${val}".`);
-            if (ok) { f.name = val; syncSet('folders', f); }
+            if (ok) f.name = val;
           }
           renderSnippets();
         };
@@ -734,9 +685,8 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
           if (!confirm(msg)) return;
           const ok = await requireAdmin(`Delete the "${f.name}" folder.`);
           if (!ok) return;
-          state.snippets.forEach((s) => { if (s.folderId === f.id) { s.folderId = null; syncSet('snippets', s); } });
+          state.snippets.forEach((s) => { if (s.folderId === f.id) s.folderId = null; });
           state.folders = state.folders.filter((x) => x.id !== f.id);
-          syncDelete('folders', f.id);
           if (state.activeFolder === f.id) state.activeFolder = 'all';
           renderSnippets();
         });
@@ -754,7 +704,6 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
         if (!ok) return;
         dragged.folderId = f.id;
         dragged.order = state.snippets.filter((s) => s.folderId === f.id).length;
-        syncSet('snippets', dragged);
         renderSnippets();
       });
 
@@ -849,11 +798,10 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
           const without = group.filter((id) => id !== draggedId);
           const idx = without.indexOf(snippet.id);
           without.splice(idx, 0, draggedId);
-          without.forEach((id, i) => { const s = state.snippets.find((x) => x.id === id); if (s) { s.order = i; syncSet('snippets', s); } });
+          without.forEach((id, i) => { const s = state.snippets.find((x) => x.id === id); if (s) s.order = i; });
         } else {
           dragged.folderId = snippet.folderId;
           dragged.order = state.snippets.filter((s) => s.folderId === snippet.folderId).length;
-          syncSet('snippets', dragged);
         }
         renderSnippets();
       });
@@ -898,12 +846,9 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
       if (!ok) return;
       if (isNew) {
         const order = state.snippets.filter((s) => s.folderId === folderId).length;
-        const newSnippet = { id: uid(), title, content, folderId, order, createdAt: Date.now(), updatedAt: Date.now() };
-        state.snippets.push(newSnippet);
-        syncSet('snippets', newSnippet);
+        state.snippets.push({ id: uid(), title, content, folderId, order, createdAt: Date.now(), updatedAt: Date.now() });
       } else {
         snippet.title = title; snippet.content = content; snippet.folderId = folderId; snippet.updatedAt = Date.now();
-        syncSet('snippets', snippet);
       }
       state.editing = null;
       toast('Snippet saved.');
@@ -918,7 +863,6 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
       const ok = await requireAdmin(`Delete "${snippet.title}".`);
       if (!ok) return;
       state.snippets = state.snippets.filter((s) => s.id !== snippet.id);
-      syncDelete('snippets', snippet.id);
       state.editing = null;
       toast('Snippet deleted.');
       renderSnippets();
@@ -1007,7 +951,6 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
         const ok = await requireAdmin(`Mark "${task.title}" as open again.`);
         if (!ok) return;
         task.status = 'open';
-        syncSet('tasks', task);
         renderTasks();
       } else {
         await openCompletionForm(task);
@@ -1092,7 +1035,6 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
         const ok = await requireAdmin(`Restore "${task.title}" from the recycle bin.`);
         if (!ok) return;
         task.deleted = false; task.deletedBy = null; task.deletedAt = null;
-        syncSet('tasks', task);
         toast('Task restored.'); renderTasks();
       });
       const forgetBtn = document.createElement('button');
@@ -1103,7 +1045,6 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
         const ok = await requireAdmin(`Permanently delete "${task.title}".`);
         if (!ok) return;
         state.tasks = state.tasks.filter((t) => t.id !== task.id);
-        syncDelete('tasks', task.id);
         toast('Task permanently deleted.'); renderTasks();
       });
       actions.append(restoreBtn, forgetBtn);
@@ -1128,14 +1069,12 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
       overlay.innerHTML = `
         <div class="modal-card">
           <h3>Mark "${escapeHtml(task.title || 'this task')}" done</h3>
-          <label>Completed by</label>
-          <div class="name-choice-row" style="display:flex;gap:8px;margin-bottom:10px;">
-            ${ADMIN_NAMES.map((n) => `<button type="button" class="btn btn-ghost btn-sm name-choice" data-name="${escapeHtml(n)}" style="flex:1;">${escapeHtml(n)}</button>`).join('')}
-          </div>
+          <label for="cfName">Completed by</label>
+          <input id="cfName" class="field-input" style="margin-bottom:10px;" />
           <label for="cfComment">Comment (optional)</label>
           <textarea id="cfComment" class="field-textarea" style="min-height:60px;margin-bottom:10px;" placeholder="Anything worth noting…"></textarea>
-          <label for="cfExpr">Password</label>
-          <input id="cfExpr" class="field-input" type="password" placeholder="Enter password" autocomplete="off" />
+          <label for="cfExpr">Admin check — enter a calculation, not the answer</label>
+          <input id="cfExpr" class="field-input" autocomplete="off" />
           <p class="hint" id="cfErr" style="color:var(--danger); display:none;"></p>
           <div class="modal-actions">
             <button class="btn btn-ghost btn-sm" id="cfCancel">Cancel</button>
@@ -1143,29 +1082,18 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
           </div>
         </div>`;
       document.body.appendChild(overlay);
-      let completedBy = null;
-      const nameButtons = Array.from(overlay.querySelectorAll('.name-choice'));
-      const errEl = overlay.querySelector('#cfErr');
-      nameButtons.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          completedBy = btn.dataset.name;
-          nameButtons.forEach((b) => {
-            b.classList.toggle('btn-primary', b === btn);
-            b.classList.toggle('btn-ghost', b !== btn);
-          });
-          errEl.style.display = 'none';
-        });
-      });
       const close = () => { overlay.remove(); resolve(); };
       overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
       overlay.querySelector('#cfCancel').addEventListener('click', close);
+      overlay.querySelector('#cfName').focus();
       overlay.querySelector('#cfConfirm').addEventListener('click', () => {
-        if (!completedBy) { errEl.textContent = 'Choose who completed this.'; errEl.style.display = 'block'; return; }
+        const errEl = overlay.querySelector('#cfErr');
+        const completedBy = overlay.querySelector('#cfName').value.trim();
+        if (!completedBy) { errEl.textContent = 'Enter who completed this.'; errEl.style.display = 'block'; return; }
         const check = checkAdminExpression(overlay.querySelector('#cfExpr').value);
         if (!check.ok) { errEl.textContent = check.error; errEl.style.display = 'block'; return; }
         const comment = overlay.querySelector('#cfComment').value.trim();
         task.status = 'done'; task.completedBy = completedBy; task.completedAt = Date.now(); task.comment = comment;
-        syncSet('tasks', task);
         toast('Task marked done.');
         renderTasks();
         close();
@@ -1216,7 +1144,7 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
     wrap.innerHTML = `
       <div class="field-row">
         <div class="field"><label>Title</label><input class="field-input" data-f="title" value="${escapeHtml(task ? task.title : '')}" placeholder="Task title" /></div>
-        <div class="field" style="flex:0 0 160px"><label>Due date *</label><input class="field-input" type="date" data-f="dueDate" required value="${task && task.dueDate ? task.dueDate : (isNew ? todayISO() : '')}" /></div>
+        <div class="field" style="flex:0 0 160px"><label>Due date</label><input class="field-input" type="date" data-f="dueDate" value="${task && task.dueDate ? task.dueDate : ''}" /></div>
       </div>
       <label>Description</label>
       <textarea class="field-textarea" data-f="description" placeholder="Details…" style="min-height:60px">${escapeHtml(task ? task.description : '')}</textarea>
@@ -1236,18 +1164,13 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
       const get = (f) => wrap.querySelector(`[data-f="${f}"]`).value;
       const title = get('title').trim();
       if (!title) { toast('Give the task a title.', true); return; }
-      const dueDate = get('dueDate');
-      if (!dueDate) { toast('Due date is required.', true); return; }
       const name = await promptNameAndAdmin(isNew ? 'Who is creating this task?' : 'Who is making this change?');
       if (!name) return;
-      const patch = { title, description: get('description'), dueDate, photos: draftPhotos };
+      const patch = { title, description: get('description'), dueDate: get('dueDate') || null, photos: draftPhotos };
       if (isNew) {
-        const newTask = { id: uid(), ...patch, status: 'open', createdBy: name, createdAt: Date.now(), lastUpdatedBy: null, lastUpdatedAt: null, completedBy: null, completedAt: null, comment: '', deleted: false };
-        state.tasks.push(newTask);
-        syncSet('tasks', newTask);
+        state.tasks.push({ id: uid(), ...patch, status: 'open', createdBy: name, createdAt: Date.now(), lastUpdatedBy: null, lastUpdatedAt: null, completedBy: null, completedAt: null, comment: '', deleted: false });
       } else {
         Object.assign(task, patch, { lastUpdatedBy: name, lastUpdatedAt: Date.now() });
-        syncSet('tasks', task);
       }
       state.editing = null;
       toast('Task saved.');
@@ -1261,7 +1184,6 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
       const name = await promptNameAndAdmin('Who is deleting this task?');
       if (!name) return;
       task.deleted = true; task.deletedBy = name; task.deletedAt = Date.now();
-      syncSet('tasks', task);
       state.editing = null;
       toast('Task moved to the recycle bin.');
       renderTasks();
@@ -1275,55 +1197,50 @@ import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'ht
     renderTasks();
   });
 
-  // ---------------- Boot: subscribe to the shared Firestore data ----------------
-  function showLoadError(detail) {
+  // ---------------- Boot: fetch the shared data.json ----------------
+  function showLoadError() {
     const slot = document.getElementById('banner-slot');
     slot.innerHTML = '';
     const b = document.createElement('div');
     b.className = 'banner';
     b.style.background = 'var(--danger-wash)';
     b.style.borderColor = 'color-mix(in srgb, var(--danger) 45%, transparent)';
-    b.textContent = 'Could not connect to the shared database' + (detail ? ': ' + detail : '.') + ' Check your internet connection and try reloading.';
+    if (location.protocol === 'file:') {
+      // Browsers block fetch() from reading local files entirely under
+      // file:// — this isn't a missing-file problem, so the generic
+      // message below would be actively misleading here.
+      b.innerHTML = 'This page was opened as a local file (<code>file://</code>), and browsers block pages opened that way from reading <code>data.json</code> at all — this is not a missing-file problem. Serve this folder through a local web server instead (e.g. run <code>npx serve</code> or <code>python3 -m http.server</code> in this folder and open the printed <code>http://localhost</code> address), or host it on GitHub Pages.';
+    } else {
+      b.textContent = 'An error occurred while fetching the data. Please make sure the data file exists in the application folder.';
+    }
     slot.appendChild(b);
-  }
-  function clearLoadError() {
-    const slot = document.getElementById('banner-slot');
-    if (slot.querySelector('.banner')) slot.innerHTML = '';
+    ['newSnippetBtn', 'newFolderBtn', 'newTaskBtn', 'exportSnippetsBtn', 'exportAllBtn'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = true;
+    });
   }
 
-  // Each collection keeps state.* in sync live. Firestore doesn't store the
-  // document's own id inside its data, so it's spliced back in from d.id.
-  let foldersLoaded = false, snippetsLoaded = false, tasksLoaded = false;
-  function checkAllLoaded() {
-    if (foldersLoaded && snippetsLoaded && tasksLoaded) {
+  async function loadData() {
+    try {
+      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const payload = await res.json();
+      if (!payload || !Array.isArray(payload.folders) || !Array.isArray(payload.snippets) || !Array.isArray(payload.tasks)) {
+        throw new Error('unexpected data.json shape');
+      }
+      state.folders = payload.folders;
+      state.snippets = payload.snippets;
+      state.tasks = payload.tasks;
       state.dataLoaded = true;
-      clearLoadError();
+    } catch (e) {
+      state.dataLoaded = false;
+      showLoadError();
     }
   }
 
-  onSnapshot(collection(db, 'folders'), (snap) => {
-    state.folders = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    foldersLoaded = true;
-    checkAllLoaded();
-    renderAll();
-  }, (err) => showLoadError(err.message));
-
-  onSnapshot(collection(db, 'snippets'), (snap) => {
-    state.snippets = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    snippetsLoaded = true;
-    checkAllLoaded();
-    renderAll();
-  }, (err) => showLoadError(err.message));
-
-  onSnapshot(collection(db, 'tasks'), (snap) => {
-    state.tasks = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    tasksLoaded = true;
-    checkAllLoaded();
-    renderAll();
-  }, (err) => showLoadError(err.message));
-
-  (function boot() {
+  (async function boot() {
     applyTheme();
+    await loadData();
     renderAll();
   })();
 })();
