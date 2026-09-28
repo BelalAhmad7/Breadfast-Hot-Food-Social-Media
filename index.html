@@ -307,26 +307,51 @@
   </div>
   <div class="drawer-section">
     <h3>Data source</h3>
-    <p class="hint">All data loads from <code>data.json</code> in this app's own folder — everyone who opens this page sees the same file. Admin actions update this browser's copy only; to actually publish a change for everyone, export the file below and replace <code>data.json</code> in the app's folder with it.</p>
-    <button class="btn btn-ghost" id="exportAllBtn">Export current data (.json)</button>
+    <p class="hint">Folders, snippets and tasks are stored in a shared Firebase database and sync live — everyone who has this page open sees changes within a second or two, no exporting or replacing files needed. The button below just downloads a local backup copy any time you want one.</p>
+    <button class="btn btn-ghost" id="exportAllBtn">Download a backup (.json)</button>
   </div>
 </aside>
 
 <div id="toast" class="toast" hidden></div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
 (function () {
   'use strict';
 
   // ==================================================================
-  // Data source: everyone loads the same data.json sitting next to this
-  // HTML file. There is no backend, so this app can only READ that file —
-  // nothing here can write back to it. Admin actions below change this
-  // browser's in-memory copy only; to actually publish a change for
-  // everyone, export the data (Settings drawer) and replace data.json in
-  // the app's folder with the exported file.
+  // Data source: a shared Firebase project (Firestore). Folders, snippets
+  // and tasks live in three top-level collections there; every open tab
+  // subscribes to live updates (onSnapshot below) instead of loading a
+  // static file, so a change made on one device shows up everywhere else
+  // within a second or two, with no manual export/import step.
   // ==================================================================
-  const DATA_URL = 'data.json';
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwb5l_m_6XV0p4wOWDpXr8sbGFktLoBCE",
+    authDomain: "hootfood-smp-db.firebaseapp.com",
+    projectId: "hootfood-smp-db",
+    storageBucket: "hootfood-smp-db.firebasestorage.app",
+    messagingSenderId: "491152786202",
+    appId: "1:491152786202:web:ebe03810bec5651b69e2a3"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  const db = getFirestore(fbApp);
+
+  // Fire-and-forget writes to Firestore. The local `state` array is always
+  // updated first so the UI feels instant; these just push that same
+  // change to the shared database. Failures (e.g. no network, or the
+  // Firestore rules aren't published yet) surface as a toast rather than
+  // silently vanishing.
+  function syncSet(collectionName, obj) {
+    setDoc(doc(db, collectionName, obj.id), obj)
+      .catch((e) => toast('Could not save to the shared database: ' + e.message, true));
+  }
+  function syncDelete(collectionName, id) {
+    deleteDoc(doc(db, collectionName, id))
+      .catch((e) => toast('Could not delete from the shared database: ' + e.message, true));
+  }
 
   const LS_SETTINGS = 'bf_settings'; // theme is a personal display preference, kept locally — not shared data
 
@@ -651,6 +676,7 @@
     if (!ok) return;
     const folder = { id: uid(), name: 'New folder', order: state.folders.length };
     state.folders.push(folder);
+    syncSet('folders', folder);
     state.renamingFolderId = folder.id;
     renderSnippets();
   });
@@ -688,7 +714,7 @@
           const val = input.value.trim();
           if (val && val !== f.name) {
             const ok = await requireAdmin(`Rename folder to "${val}".`);
-            if (ok) f.name = val;
+            if (ok) { f.name = val; syncSet('folders', f); }
           }
           renderSnippets();
         };
@@ -708,8 +734,9 @@
           if (!confirm(msg)) return;
           const ok = await requireAdmin(`Delete the "${f.name}" folder.`);
           if (!ok) return;
-          state.snippets.forEach((s) => { if (s.folderId === f.id) s.folderId = null; });
+          state.snippets.forEach((s) => { if (s.folderId === f.id) { s.folderId = null; syncSet('snippets', s); } });
           state.folders = state.folders.filter((x) => x.id !== f.id);
+          syncDelete('folders', f.id);
           if (state.activeFolder === f.id) state.activeFolder = 'all';
           renderSnippets();
         });
@@ -727,6 +754,7 @@
         if (!ok) return;
         dragged.folderId = f.id;
         dragged.order = state.snippets.filter((s) => s.folderId === f.id).length;
+        syncSet('snippets', dragged);
         renderSnippets();
       });
 
@@ -821,10 +849,11 @@
           const without = group.filter((id) => id !== draggedId);
           const idx = without.indexOf(snippet.id);
           without.splice(idx, 0, draggedId);
-          without.forEach((id, i) => { const s = state.snippets.find((x) => x.id === id); if (s) s.order = i; });
+          without.forEach((id, i) => { const s = state.snippets.find((x) => x.id === id); if (s) { s.order = i; syncSet('snippets', s); } });
         } else {
           dragged.folderId = snippet.folderId;
           dragged.order = state.snippets.filter((s) => s.folderId === snippet.folderId).length;
+          syncSet('snippets', dragged);
         }
         renderSnippets();
       });
@@ -869,9 +898,12 @@
       if (!ok) return;
       if (isNew) {
         const order = state.snippets.filter((s) => s.folderId === folderId).length;
-        state.snippets.push({ id: uid(), title, content, folderId, order, createdAt: Date.now(), updatedAt: Date.now() });
+        const newSnippet = { id: uid(), title, content, folderId, order, createdAt: Date.now(), updatedAt: Date.now() };
+        state.snippets.push(newSnippet);
+        syncSet('snippets', newSnippet);
       } else {
         snippet.title = title; snippet.content = content; snippet.folderId = folderId; snippet.updatedAt = Date.now();
+        syncSet('snippets', snippet);
       }
       state.editing = null;
       toast('Snippet saved.');
@@ -886,6 +918,7 @@
       const ok = await requireAdmin(`Delete "${snippet.title}".`);
       if (!ok) return;
       state.snippets = state.snippets.filter((s) => s.id !== snippet.id);
+      syncDelete('snippets', snippet.id);
       state.editing = null;
       toast('Snippet deleted.');
       renderSnippets();
@@ -974,6 +1007,7 @@
         const ok = await requireAdmin(`Mark "${task.title}" as open again.`);
         if (!ok) return;
         task.status = 'open';
+        syncSet('tasks', task);
         renderTasks();
       } else {
         await openCompletionForm(task);
@@ -1058,6 +1092,7 @@
         const ok = await requireAdmin(`Restore "${task.title}" from the recycle bin.`);
         if (!ok) return;
         task.deleted = false; task.deletedBy = null; task.deletedAt = null;
+        syncSet('tasks', task);
         toast('Task restored.'); renderTasks();
       });
       const forgetBtn = document.createElement('button');
@@ -1068,6 +1103,7 @@
         const ok = await requireAdmin(`Permanently delete "${task.title}".`);
         if (!ok) return;
         state.tasks = state.tasks.filter((t) => t.id !== task.id);
+        syncDelete('tasks', task.id);
         toast('Task permanently deleted.'); renderTasks();
       });
       actions.append(restoreBtn, forgetBtn);
@@ -1129,6 +1165,7 @@
         if (!check.ok) { errEl.textContent = check.error; errEl.style.display = 'block'; return; }
         const comment = overlay.querySelector('#cfComment').value.trim();
         task.status = 'done'; task.completedBy = completedBy; task.completedAt = Date.now(); task.comment = comment;
+        syncSet('tasks', task);
         toast('Task marked done.');
         renderTasks();
         close();
@@ -1205,9 +1242,12 @@
       if (!name) return;
       const patch = { title, description: get('description'), dueDate, photos: draftPhotos };
       if (isNew) {
-        state.tasks.push({ id: uid(), ...patch, status: 'open', createdBy: name, createdAt: Date.now(), lastUpdatedBy: null, lastUpdatedAt: null, completedBy: null, completedAt: null, comment: '', deleted: false });
+        const newTask = { id: uid(), ...patch, status: 'open', createdBy: name, createdAt: Date.now(), lastUpdatedBy: null, lastUpdatedAt: null, completedBy: null, completedAt: null, comment: '', deleted: false };
+        state.tasks.push(newTask);
+        syncSet('tasks', newTask);
       } else {
         Object.assign(task, patch, { lastUpdatedBy: name, lastUpdatedAt: Date.now() });
+        syncSet('tasks', task);
       }
       state.editing = null;
       toast('Task saved.');
@@ -1221,6 +1261,7 @@
       const name = await promptNameAndAdmin('Who is deleting this task?');
       if (!name) return;
       task.deleted = true; task.deletedBy = name; task.deletedAt = Date.now();
+      syncSet('tasks', task);
       state.editing = null;
       toast('Task moved to the recycle bin.');
       renderTasks();
@@ -1234,50 +1275,55 @@
     renderTasks();
   });
 
-  // ---------------- Boot: fetch the shared data.json ----------------
-  function showLoadError() {
+  // ---------------- Boot: subscribe to the shared Firestore data ----------------
+  function showLoadError(detail) {
     const slot = document.getElementById('banner-slot');
     slot.innerHTML = '';
     const b = document.createElement('div');
     b.className = 'banner';
     b.style.background = 'var(--danger-wash)';
     b.style.borderColor = 'color-mix(in srgb, var(--danger) 45%, transparent)';
-    if (location.protocol === 'file:') {
-      // Browsers block fetch() from reading local files entirely under
-      // file:// — this isn't a missing-file problem, so the generic
-      // message below would be actively misleading here.
-      b.innerHTML = 'This page was opened as a local file (<code>file://</code>), and browsers block pages opened that way from reading <code>data.json</code> at all — this is not a missing-file problem. Serve this folder through a local web server instead (e.g. run <code>npx serve</code> or <code>python3 -m http.server</code> in this folder and open the printed <code>http://localhost</code> address), or host it on GitHub Pages.';
-    } else {
-      b.textContent = 'An error occurred while fetching the data. Please make sure the data file exists in the application folder.';
-    }
+    b.textContent = 'Could not connect to the shared database' + (detail ? ': ' + detail : '.') + ' Check your internet connection and try reloading.';
     slot.appendChild(b);
-    ['newSnippetBtn', 'newFolderBtn', 'newTaskBtn', 'exportSnippetsBtn', 'exportAllBtn'].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.disabled = true;
-    });
+  }
+  function clearLoadError() {
+    const slot = document.getElementById('banner-slot');
+    if (slot.querySelector('.banner')) slot.innerHTML = '';
   }
 
-  async function loadData() {
-    try {
-      const res = await fetch(DATA_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const payload = await res.json();
-      if (!payload || !Array.isArray(payload.folders) || !Array.isArray(payload.snippets) || !Array.isArray(payload.tasks)) {
-        throw new Error('unexpected data.json shape');
-      }
-      state.folders = payload.folders;
-      state.snippets = payload.snippets;
-      state.tasks = payload.tasks;
+  // Each collection keeps state.* in sync live. Firestore doesn't store the
+  // document's own id inside its data, so it's spliced back in from d.id.
+  let foldersLoaded = false, snippetsLoaded = false, tasksLoaded = false;
+  function checkAllLoaded() {
+    if (foldersLoaded && snippetsLoaded && tasksLoaded) {
       state.dataLoaded = true;
-    } catch (e) {
-      state.dataLoaded = false;
-      showLoadError();
+      clearLoadError();
     }
   }
 
-  (async function boot() {
+  onSnapshot(collection(db, 'folders'), (snap) => {
+    state.folders = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    foldersLoaded = true;
+    checkAllLoaded();
+    renderAll();
+  }, (err) => showLoadError(err.message));
+
+  onSnapshot(collection(db, 'snippets'), (snap) => {
+    state.snippets = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    snippetsLoaded = true;
+    checkAllLoaded();
+    renderAll();
+  }, (err) => showLoadError(err.message));
+
+  onSnapshot(collection(db, 'tasks'), (snap) => {
+    state.tasks = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    tasksLoaded = true;
+    checkAllLoaded();
+    renderAll();
+  }, (err) => showLoadError(err.message));
+
+  (function boot() {
     applyTheme();
-    await loadData();
     renderAll();
   })();
 })();
